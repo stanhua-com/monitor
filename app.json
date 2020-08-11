@@ -1,0 +1,17 @@
+{
+  "name": "monitor",
+  "script": "./start.js",
+  "cwd": "./",
+  "exec_mode": "cluster_mode",
+  "error_file": "/var/log/node/error/monitor/err.log",
+  "out_file": "/var/log/node/out/monitor/out.log",
+  "merge_logs": true,
+  "log_date_format": "YYYY-MM-DD HH:mm Z",
+  "instances": 3,
+  "max_memory_restart": "5G",
+  "max_restarts": 100,
+  "instance_var": "INSTANCE_ID",
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
