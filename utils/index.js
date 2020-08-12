@@ -3,6 +3,7 @@
 import { v4 as uuid4 } from 'uuid'
 import request from 'request'
 import cheerio from 'cheerio'
+import shell from 'shelljs'
 
 export default class Util {
   constructor() {
@@ -73,7 +74,7 @@ export default class Util {
    * @param {Number} time 延迟时间
    */
   static sleep(time) {
-    return new Promise(function (resolve, reject) {
+    return new Promise(function (resolve) {
       setTimeout(function () {
         resolve()
       }, time)
@@ -132,4 +133,21 @@ export default class Util {
     debar && (s = s.replace(/-/g, ''))
     return s
   }
+
+  /**
+   * 执行命令
+   * @param {String} command 命令
+   */
+  static exec(command) {
+    return new Promise((resolve, reject) => {
+      shell.exec(command, { silent: true, async: true }, (code, stdout, stderr) => {
+        if (code === 0) resolve(stdout)
+        else {
+          reject(stderr)
+          throw stderr
+        }
+      })
+    })
+  }
+
 }

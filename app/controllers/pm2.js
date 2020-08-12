@@ -2,6 +2,8 @@
 
 import Controller from './index'
 
+import Util from '../../utils'
+
 import Pm2 from '../services/pm2'
 
 class Pm2Controller extends Controller {
@@ -104,9 +106,15 @@ class Pm2Controller extends Controller {
    * 获取由pm2管理的正在运行的进程的列表
    */
   async list(ctx, next) {
-    let l = await Pm2.list()
-    console.log(l)
-    ctx.body = await Pm2.list()
+    await Util.exec('pm2 ls').then(res => {
+      console.log(res)
+      let list = res.split(' ')
+      list.splice(0, 1)
+      list.splice(list.length - 1, 1)
+      ctx.body = { code: 200, msg: '', data: list }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
   }
 
   /**

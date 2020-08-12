@@ -1,27 +1,12 @@
 'use strict'
 
-const pm2 = require('pm2')
-
 import ErrorInfo from '../../utils/errorInfo'
+import Util from '../../utils'
 import Log from '../../utils/log'
 
 class Pm2Service {
   constructor() {
 
-  }
-
-  connect() {
-    return new Promise((resolve, reject) => {
-      pm2.connect((err) => {
-        if (err) {
-          Log.error(err)
-          reject(err)
-          return ErrorInfo.serverError()
-        }
-
-        resolve()
-      })
-    })
   }
 
   /**
@@ -172,22 +157,12 @@ class Pm2Service {
    * 获取由pm2管理的正在运行的进程的列表
    */
   async list() {
-    let arr = []
-    await this.connect().then(() => {
-      pm2.list((err, list) => {
-        pm2.disconnect()
-
-        if (err) {
-          Log.error(err)
-          return { code: 1001, msg: '获取失败', data: '' }
-        }
-        arr = [1]
-        return { code: 200, msg: '', data: list }
-      })
-    }).catch(err => {
-      console.log(err)
+    await Util.exec('pm2 ls').then(res => {
+      console.log('res', res)
+      return { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      return { code: 1001, msg: '', data: err }
     })
-    return arr
   }
 
   /**
