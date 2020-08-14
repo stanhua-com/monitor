@@ -82,6 +82,76 @@ class SystemController extends Controller {
 
     return { idle, total: user + nice + sys + idle + irq }
   }
+
+  // #region Linux资源
+
+  /**
+   * 查看内存使用量和交换区使用量
+   */
+  async free(ctx, next) {
+    await Util.exec(`free -m`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 查看各分区使用情况
+   */
+  async systemFile(ctx, next) {
+    await Util.exec(`df -h`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 查看系统负载
+   */
+  async loadavg(ctx, next) {
+    await Util.exec(`cat /proc/loadavg`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 查看内存信息
+   */
+  async meminfo(ctx, next) {
+    await Util.exec(`cat /proc/meminfo`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 查看网卡信息
+   */
+  async eth(ctx, next) {
+    await Util.exec(`dmesg | grep -i eth`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 实时显示进程状态
+   */
+  async top(ctx, next) {
+    await Util.exec(`top`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  // #endregion
 }
 
 export default new SystemController()

@@ -56,7 +56,12 @@ class Pm2Controller extends Controller {
     if (this.isEmpty(process))
       return ctx.body = this.errorInfo.required('process')
 
-    ctx.body = await Pm2.restart(process)
+    await Util.exec(`pm2 restart ${process}`).then(res => {
+      console.log(res)
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
   }
 
   /**
@@ -131,11 +136,11 @@ class Pm2Controller extends Controller {
    */
   async list(ctx, next) {
     await Util.exec('pm2 ls').then(res => {
-      console.log(res)
-      let list = res.split(' ')
-      list.splice(0, 1)
-      list.splice(list.length - 1, 1)
-      ctx.body = { code: 200, msg: '', data: list }
+      // console.log(res)
+      // let list = res.split(' ')
+      // list.splice(0, 1)
+      // list.splice(list.length - 1, 1)
+      ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
     })
@@ -145,8 +150,7 @@ class Pm2Controller extends Controller {
    * 将进程列表写入DUMP_FILE_PATH环境变量 ("~/.pm2/dump.pm2" by default)
    */
   async dump(ctx, next) {
-
-    await Util.exec(`pm2 dump ${process}`).then(res => {
+    await Util.exec(`pm2 dump`).then(res => {
       console.log(res)
       ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
