@@ -19,8 +19,9 @@ router.post('/kill', Pm2.kill.bind(Pm2))
 router.post('/describe', Pm2.describe.bind(Pm2))
 router.post('/dump', Pm2.dump.bind(Pm2))
 router.post('/flush', Pm2.flush.bind(Pm2))
-router.post('/reload_logs', Pm2.reloadLogs.bind(Pm2))
+router.post('/logs', Pm2.logs.bind(Pm2))
+router.post('/monit', Pm2.monit.bind(Pm2))
 router.post('/launch_bus', Pm2.launchBus.bind(Pm2))
 router.post('/startup', Pm2.startup.bind(Pm2))
 
-export default router 
+export default router
