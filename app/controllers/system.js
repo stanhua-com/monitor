@@ -98,10 +98,8 @@ class SystemController extends Controller {
    * available  开启一个新程序能够使用的最大内存
    */
   async free(ctx, next) {
-    ctx.body = { code: 200, msg: '', data: ChildProcess.execParse('              total        used        free      shared  buff/cache   available\nMem:           7976        3129        4473           0         373        4603\nSwap:           947         391         555\n') }
-    return
     await ChildProcess.exec(`free -m`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
+      ctx.body = { code: 200, msg: '', data: ChildProcess.execArrayParse(res, ['', 'total', 'used', 'free', 'shared', 'buff/cache', 'available']) }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
     })
@@ -112,7 +110,7 @@ class SystemController extends Controller {
    */
   async loadavg(ctx, next) {
     await ChildProcess.exec(`cat /proc/loadavg`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
+      ctx.body = { code: 200, msg: '', data: res ? String(res).replace('\n', '') : '' }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
     })
@@ -123,7 +121,7 @@ class SystemController extends Controller {
    */
   async meminfo(ctx, next) {
     await ChildProcess.exec(`cat /proc/meminfo`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
+      ctx.body = { code: 200, msg: '', data: ChildProcess.execObjectParse(res) }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
     })
@@ -150,7 +148,7 @@ class SystemController extends Controller {
    */
   async disk(ctx, next) {
     await ChildProcess.exec(`df -h`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
+      ctx.body = { code: 200, msg: '', data: ChildProcess.execArrayParse(res, ['Filesystem', 'Size', 'Used', 'Avail', 'Use%', 'Mounted on']) }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
     })
@@ -158,28 +156,29 @@ class SystemController extends Controller {
 
   /**
    * 文件属主和属组
+   * d:目录,
+   * -:文件,
+   * l:链接文档(link file),
+   * b:装置文件里面的可供储存的接口设备(可随机存取装置)
+   * c:装置文件里面的串行端口设备，例如键盘、鼠标(一次性读取装置)
+   * [ r ]代表可读(read)、[ w ]代表可写(write)、[ x ]代表可执行(execute)
    * @param {String} cd cd路径
+   * @returns 
+   * FileName          文件名
+   * FileSize          文件大小
+   * FileType          文件类型
+   * RecentlyModified  最近修改
+   * Authority         权限
+   * AllGroups         所有者/组
    */
   async ls(ctx, next) {
     let { cd } = ctx.query
-    if (cd) {
-      await ChildProcess.exec(`cd ${cd}`).then(res => {
-        await ChildProcess.exec(`ls -l`).then(res => {
-          ctx.body = { code: 200, msg: '', data: res }
-        }).catch((err) => {
-          ctx.body = { code: 1001, msg: '', data: err }
-        })
-      }).catch((err) => {
-        ctx.body = { code: 1001, msg: '', data: err }
-      })
-    }
-    else {
-      await ChildProcess.exec(`ls -l`).then(res => {
-        ctx.body = { code: 200, msg: '', data: res }
-      }).catch((err) => {
-        ctx.body = { code: 1001, msg: '', data: err }
-      })
-    }
+    cd = cd || '/'
+    await ChildProcess.exec(`ls -al ${cd}`).then(res => {
+      ctx.body = { code: 200, msg: '', data: ChildProcess.execLsParse(res, ['FileType', 'Authority', 'AllGroups', 'FileSize', 'RecentlyModified', 'FileName']) }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
   }
 
   // #endregion

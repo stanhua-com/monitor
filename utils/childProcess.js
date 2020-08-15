@@ -8,19 +8,76 @@ export default class ChildProcess {
 
   /**
    * 执行bash命令输出内容解析
-   * @param {String} str    执行bash命令输出内容
-   * @param {Number} count  对象个数
+   * @param {String} output   执行bash命令输出内容
+   * @param {Array} titles    标题
    */
-  static execParse(str, count = 7) {
-    if (!str) return ''
+  static execArrayParse(output, titles = []) {
+    if (!output) return ''
+    console.log(output)
+    let list = []
+    let lines = String(output).trim().split('\n')
+    if (titles.length & lines.length <= 1) return []
 
-    let lines = String(str).trim().split('\n')
-    for (let i = 0; i < lines.length; i++) {
-      const item = lines[i]
-
+    for (let i = 1; i < lines.length; i++) {
+      const a = lines[i].split(/\s+/)
+      let o = {}
+      for (let k = 0; k < a.length; k++) {
+        o[titles[k]] = a[k]
+      }
+      for (let k = a.length; k < titles.length; k++) {
+        o[titles[k]] = ''
+      }
+      list.push(o)
     }
-    console.log(lines)
-    return lines
+    return list
+  }
+
+  /**
+   * 执行ls命令输出内容解析
+   * @param {String} output   执行bash命令输出内容
+   * @param {Array} titles    标题
+   */
+  static execLsParse(output, titles = []) {
+    if (!output) return ''
+    console.log(output)
+    let list = []
+    let lines = String(output).trim().split('\n')
+    if (titles.length & !lines.length) return []
+
+    for (let i = 1; i < lines.length; i++) {
+      const a = lines[i].split(/\s+/)
+      let o = {}
+      o[titles[0]] = a[0][0]
+      o[titles[1]] = a[0]
+      o[titles[2]] = `${a[2]} ${a[3]}`
+      o[titles[3]] = a[4]
+      o[titles[4]] = `${a[5]} ${a[6]} ${a[7]}`
+
+      let ns = []
+      for (let k = 8; k < a.length; k++) {
+        ns.push(a[k])
+      }
+      o[titles[5]] = ns.join(' ')
+      
+      list.push(o)
+    }
+    return list
+  }
+
+  /**
+   * 执行bash命令输出内容解析
+   * @param {String} output   执行bash命令输出内容
+   * @param {Number} count    对象个数
+   */
+  static execObjectParse(output) {
+    if (!output) return ''
+    let lines = String(output).trim().replace(/ kB/g, '').split('\n')
+    let o = {}
+    for (let i = 0; i < lines.length; i++) {
+      let a = lines[i].split(': ')
+      o[a[0]] = a[1] ? String(a[1]).trim() : ''
+    }
+    return o
   }
 
   /**
