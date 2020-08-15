@@ -3,7 +3,7 @@
 import { v4 as uuid4 } from 'uuid'
 import request from 'request'
 import cheerio from 'cheerio'
-import shell from 'shelljs'
+import { exec } from 'child_process'
 
 export default class Util {
   constructor() {
@@ -108,7 +108,6 @@ export default class Util {
     })
   }
 
-
   /**
    * 随机字符串
    * @param {Number} length 位数
@@ -140,7 +139,7 @@ export default class Util {
    */
   static exec(command) {
     return new Promise((resolve, reject) => {
-      shell.exec(command, { silent: true, async: true }, (code, stdout, stderr) => {
+      exec(command, (code, stdout, stderr) => {
         if (code === 0) resolve(stdout)
         else {
           reject(stderr)

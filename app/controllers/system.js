@@ -6,6 +6,8 @@ import Controller from './index'
 
 import Utils from '../../utils'
 
+import ChildProcess from '../../utils/childProcess'
+
 class SystemController extends Controller {
   constructor() {
     super()
@@ -83,24 +85,22 @@ class SystemController extends Controller {
     return { idle, total: user + nice + sys + idle + irq }
   }
 
-  // #region Linux资源
+  // #region Linux 资源
 
   /**
    * 查看内存使用量和交换区使用量
+   * @returns
+   * total      内存总数；
+   * used       已经使用的内存数；
+   * free       空闲的内存数；
+   * shared     当前已经废弃不用；
+   * buff/cache 缓存内存数；
+   * available  开启一个新程序能够使用的最大内存
    */
   async free(ctx, next) {
-    await Util.exec(`free -m`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
-    }).catch((err) => {
-      ctx.body = { code: 1001, msg: '', data: err }
-    })
-  }
-
-  /**
-   * 查看各分区使用情况
-   */
-  async systemFile(ctx, next) {
-    await Util.exec(`df -h`).then(res => {
+    ctx.body = { code: 200, msg: '', data: ChildProcess.execParse('              total        used        free      shared  buff/cache   available\nMem:           7976        3129        4473           0         373        4603\nSwap:           947         391         555\n') }
+    return
+    await ChildProcess.exec(`free -m`).then(res => {
       ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
@@ -111,7 +111,7 @@ class SystemController extends Controller {
    * 查看系统负载
    */
   async loadavg(ctx, next) {
-    await Util.exec(`cat /proc/loadavg`).then(res => {
+    await ChildProcess.exec(`cat /proc/loadavg`).then(res => {
       ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
@@ -122,7 +122,7 @@ class SystemController extends Controller {
    * 查看内存信息
    */
   async meminfo(ctx, next) {
-    await Util.exec(`cat /proc/meminfo`).then(res => {
+    await ChildProcess.exec(`cat /proc/meminfo`).then(res => {
       ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
@@ -133,18 +133,7 @@ class SystemController extends Controller {
    * 查看网卡信息
    */
   async eth(ctx, next) {
-    await Util.exec(`dmesg | grep -i eth`).then(res => {
-      ctx.body = { code: 200, msg: '', data: res }
-    }).catch((err) => {
-      ctx.body = { code: 1001, msg: '', data: err }
-    })
-  }
-
-  /**
-   * 实时显示进程状态
-   */
-  async top(ctx, next) {
-    await Util.exec(`top`).then(res => {
+    await ChildProcess.exec(`dmesg | grep -i eth`).then(res => {
       ctx.body = { code: 200, msg: '', data: res }
     }).catch((err) => {
       ctx.body = { code: 1001, msg: '', data: err }
@@ -152,6 +141,49 @@ class SystemController extends Controller {
   }
 
   // #endregion
+
+
+  // #region 文件基本属性
+
+  /**
+   * 查看各分区使用情况
+   */
+  async disk(ctx, next) {
+    await ChildProcess.exec(`df -h`).then(res => {
+      ctx.body = { code: 200, msg: '', data: res }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+  }
+
+  /**
+   * 文件属主和属组
+   * @param {String} cd cd路径
+   */
+  async ls(ctx, next) {
+    let { cd } = ctx.query
+    if (cd) {
+      await ChildProcess.exec(`cd ${cd}`).then(res => {
+        await ChildProcess.exec(`ls -l`).then(res => {
+          ctx.body = { code: 200, msg: '', data: res }
+        }).catch((err) => {
+          ctx.body = { code: 1001, msg: '', data: err }
+        })
+      }).catch((err) => {
+        ctx.body = { code: 1001, msg: '', data: err }
+      })
+    }
+    else {
+      await ChildProcess.exec(`ls -l`).then(res => {
+        ctx.body = { code: 200, msg: '', data: res }
+      }).catch((err) => {
+        ctx.body = { code: 1001, msg: '', data: err }
+      })
+    }
+  }
+
+  // #endregion
+
 }
 
 export default new SystemController()
