@@ -1,5 +1,10 @@
-import log4js from 'log4js'
+// utils/log.js
+'use strict'
 
+import log4js from 'log4js'
+/**
+ * 日记
+ */
 class Log {
   constructor() {
     log4js.configure({

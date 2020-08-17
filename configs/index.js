@@ -1,8 +1,8 @@
 'use strict'
 
 export default {
-  // appkey
-  appKey: 'SESSION_MONITOR',
+  // appkeys
+  keys: ['SESSION_MONITOR1', 'SESSION_MONITOR2'],
   // 服务
   server: {
     port: 8009,
@@ -17,5 +17,18 @@ export default {
       user: '',
       pass: '',
     },
+  },
+  jwt: {
+    // 密钥
+    secret: 'YOWPewyGHKu4Y_0M_vtlEnNlqmFOclqp4Hy6hVHfFT4',
+    // 有效时长
+    expiresIn: '2h',
+    // 路由拦截
+    unlessPath: [
+      /^\/public/,
+      /^\/api\/login/,
+      /^\/api/,
+      // /^((?!\/api).)*$/
+    ]
   }
 }

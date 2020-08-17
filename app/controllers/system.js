@@ -5,6 +5,7 @@ import os from 'os'
 import Controller from './index'
 
 import Utils from '../../utils'
+import Secret from '../../utils/secret'
 
 import ChildProcess from '../../utils/childProcess'
 
@@ -18,6 +19,8 @@ class SystemController extends Controller {
    * 操作系统信息
    */
   info(ctx, next) {
+    ctx.cookies.set('agent', Secret.MD5(ctx.header['user-agent']), { signed: true })
+
     ctx.body = {
       code: 200, msg: '', data: {
         platform: os.platform(),
@@ -163,7 +166,7 @@ class SystemController extends Controller {
    * c:装置文件里面的串行端口设备，例如键盘、鼠标(一次性读取装置)
    * [ r ]代表可读(read)、[ w ]代表可写(write)、[ x ]代表可执行(execute)
    * @param {String} cd cd路径
-   * @returns 
+   * @returns
    * FileName          文件名
    * FileSize          文件大小
    * FileType          文件类型
