@@ -6,7 +6,12 @@
   "scripts": {
     "serve": "./node_modules/.bin/nodemon start",
     "pm2": "pm2 start app.json",
-    "build": "stanpack -s build"
+    "build": "stanpack -s build",
+    "pkg": "pkg start.js --options max_old_space_size=4096"
+  },
+  "pkg": {
+    "scripts": "build/**/*.js",
+    "assets": "public/**/*"
   },
   "dependencies": {
     "koa": "^2.13.0",
@@ -35,6 +40,7 @@
     "jsonwebtoken": "8.5.1"
   },
   "devDependencies": {
+    "pkg": "^4.4.9",
     "nodemon": "^2.0.4",
     "babel-register": "^6.26.0",
     "babel-preset-env": "^1.7.0",
