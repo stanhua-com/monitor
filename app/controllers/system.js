@@ -186,6 +186,22 @@ class SystemController extends Controller {
 
   // #endregion
 
+
+  /**
+   * 进程列表
+   */
+  async process(ctx, next) {
+    const isWin = process.platform === 'win32'
+    const cmd = isWin ? 'tasklist' : 'ps aux'
+    const titles = isWin ? ['映像名称', 'PID', '会话名', '会话#', '内存使用',] : ['USER', 'PID', '%CPU', '%MEM', 'VSZ', 'RSS', 'TTY', 'STAT', 'START', 'TIME', 'COMMAND']
+    await ChildProcess.exec(cmd).then(res => {
+      ctx.body = { code: 200, msg: '', data: ChildProcess.execArrayParse(res, titles) }
+    }).catch((err) => {
+      ctx.body = { code: 1001, msg: '', data: err }
+    })
+    await next()
+  }
+
 }
 
 export default new SystemController()

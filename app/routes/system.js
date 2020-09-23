@@ -17,5 +17,6 @@ router.get('/eth', System.eth.bind(System))
 
 router.get('/disk', System.disk.bind(System))
 router.get('/ls', System.ls.bind(System))
+router.get('/process', System.process.bind(System))
 
 export default router
